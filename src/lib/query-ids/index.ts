@@ -24,7 +24,7 @@ const FALLBACK_QUERY_IDS: Record<string, string> = {
   'Bookmarks': '2neUNDqrrFzbLui8yallcQ',
   
   // Search
-  'SearchTimeline': 'VhUd6vHVmLBcw0uX-6jMLA',
+  'SearchTimeline': '6AAys3t42mosm_yTI_QENg',
   
   // Social graph
   'Followers': 'IOh4aS6UdGWGJUYTqliQ7Q',

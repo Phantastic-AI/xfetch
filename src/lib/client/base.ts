@@ -105,9 +105,14 @@ export class BaseClient {
       responsive_web_jetfuel_frame: true,
     };
 
+    const mergedFeatures = features || defaultFeatures;
     const url = new URL(`https://x.com/i/api/graphql/${queryId}/${operationName}`);
+    // SearchTimeline requires POST with features in body (Twitter API change)
+    const usePost = operationName === 'SearchTimeline';
     url.searchParams.set('variables', JSON.stringify(variables));
-    url.searchParams.set('features', JSON.stringify(features || defaultFeatures));
+    if (!usePost) {
+      url.searchParams.set('features', JSON.stringify(mergedFeatures));
+    }
 
     // Add jitter to avoid detection
     if (this.options.jitterMs) {
@@ -125,12 +130,16 @@ export class BaseClient {
     const currentProxy = this.proxyManager?.getCurrent();
 
     try {
-      const response = await request(url.toString(), {
-        method: 'GET',
+      const requestOptions: Record<string, any> = {
+        method: usePost ? 'POST' : 'GET',
         headers,
         signal: AbortSignal.timeout(this.options.timeoutMs!),
         dispatcher,
-      });
+      };
+      if (usePost) {
+        requestOptions.body = JSON.stringify({ features: mergedFeatures, queryId });
+      }
+      const response = await request(url.toString(), requestOptions);
 
       // Mark proxy success
       if (currentProxy) {
